@@ -1,5 +1,10 @@
 package com.example.demo.service;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import javax.validation.constraints.NotNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dao.UserDaoRepository;
 import com.example.demo.model.AppUser;
+import com.example.demo.model.ConfirmToken;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,6 +27,9 @@ public class AppUserService implements UserDetailsService {
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	@Autowired
+	private ConfirmTokenService confirmTokenService;
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -29,7 +38,7 @@ public class AppUserService implements UserDetailsService {
 				() -> new UsernameNotFoundException(String.format("User not found with email: %s", email)));
 	}
 
-	public AppUser signUpUser(AppUser user) {
+	public String signUpUser(AppUser user) {
 
 		boolean userExist = userDaoRepository.findByEmail(user.getEmail()).isPresent();
 		if (userExist) {
@@ -39,7 +48,20 @@ public class AppUserService implements UserDetailsService {
 		String encodedPwd = bCryptPasswordEncoder.encode(user.getPassword());
 
 		user.setPassword(encodedPwd);
-		return userDaoRepository.save(user);
+		userDaoRepository.save(user);
+		
+		String token = UUID.randomUUID().toString();
+		ConfirmToken confirmToken = new ConfirmToken( token, 
+													  LocalDateTime.now(), 
+													  LocalDateTime.now().plusMinutes(15), 
+													  user);
+		
+		confirmTokenService.saveConfirmToken(confirmToken);
+		
+		return token;
+	}
 
+	public void enableAppUser(String email) {
+		userDaoRepository.enableAppUser(email);
 	}
 }

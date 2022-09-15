@@ -3,7 +3,9 @@ package com.example.demo.model;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,6 +13,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -26,7 +30,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "app_user")
-public class AppUser implements UserDetails,Serializable {
+public class AppUser implements UserDetails, Serializable {
 
 	/**
 	 * 
@@ -34,7 +38,7 @@ public class AppUser implements UserDetails,Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@NotNull
@@ -44,7 +48,7 @@ public class AppUser implements UserDetails,Serializable {
 	@NotNull
 	@Column(name = "lastName")
 	private String lastName;
-	
+
 	@NotNull
 	@Column
 	private String email;
@@ -57,12 +61,16 @@ public class AppUser implements UserDetails,Serializable {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "appUserRole")
 	private AppUserRole appUserRole;
-	
+
 	@Column
-	private Boolean locked = false;
-	
+	private Boolean locked;
+
 	@Column
-	private Boolean enabled = false;
+	private Boolean enabled;
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "user_id")
+	List<ConfirmToken> token;
 
 	public AppUser(String firstName, String lastName, String email, String password, AppUserRole appUserRole) {
 		super();
@@ -101,7 +109,7 @@ public class AppUser implements UserDetails,Serializable {
 
 	@Override
 	public String getUsername() {
-		return firstName.concat(" "+lastName);
+		return firstName.concat(" " + lastName);
 	}
 
 }
