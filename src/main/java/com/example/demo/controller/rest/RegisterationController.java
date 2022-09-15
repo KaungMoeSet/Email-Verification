@@ -13,14 +13,14 @@ import com.example.demo.dto.RegistrationRequest;
 import com.example.demo.service.RegistrationService;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/register")
 @CrossOrigin
 public class RegisterationController {
 
 	@Autowired
 	private RegistrationService registrationService;
 
-	@PostMapping("/register")
+	@PostMapping
 	String register(@RequestBody RegistrationRequest regRequest) {
 		return registrationService.userRegister(regRequest);
 	}
