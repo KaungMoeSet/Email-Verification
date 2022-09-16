@@ -63,10 +63,10 @@ public class AppUser implements UserDetails, Serializable {
 	private AppUserRole appUserRole;
 
 	@Column
-	private Boolean locked;
+	private Boolean locked = false;
 
 	@Column
-	private Boolean enabled;
+	private Boolean enabled = false;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "user_id")

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.RegistrationRequest;
-import com.example.demo.service.RegistrationService;
+import com.example.demo.service.impl.RegistrationServiceImpl;
 
 @RestController
 @RequestMapping("/api/v1/register")
@@ -18,15 +18,15 @@ import com.example.demo.service.RegistrationService;
 public class RegisterationController {
 
 	@Autowired
-	private RegistrationService registrationService;
+	private RegistrationServiceImpl registrationServiceImpl;
 
 	@PostMapping
 	String register(@RequestBody RegistrationRequest regRequest) {
-		return registrationService.userRegister(regRequest);
+		return registrationServiceImpl.userRegister(regRequest);
 	}
 
 	@PutMapping("/confirm")
 	public String confirm(@RequestParam("token") String token) {
-		return registrationService.confirmToken(token);
+		return registrationServiceImpl.confirmToken(token);
 	}
 }
